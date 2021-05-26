@@ -58,6 +58,7 @@ public class StartGame extends JFrame {
 		btnOk.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent ae){
+				// tf에 입력 된 숫자를 받아와야 한다는 것 제가 찾았어요!!
 				String s = tf.getText();
 				System.out.println(s.length());
 				if(!isDigit(s)){

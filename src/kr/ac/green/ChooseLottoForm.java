@@ -1,3 +1,7 @@
+/*
+ * 이 클래스 제가 만들었어요!!
+ */
+
 package kr.ac.green;
 
 import java.awt.BorderLayout;
