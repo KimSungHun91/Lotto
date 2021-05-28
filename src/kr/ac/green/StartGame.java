@@ -5,6 +5,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -18,7 +19,9 @@ public class StartGame extends JFrame {
 	private JTextField tf;
 	private JButton btnOk;
 	private JButton btnCancel;
-	int num = 5;
+	private JLabel lblimg;
+	int num;
+//	LottoPnlForm makePanel = new LottoPnlForm();
 	
 	public StartGame(){
 		init();
@@ -28,6 +31,9 @@ public class StartGame extends JFrame {
 	}
 
 	private void init() {
+		lblimg = new JLabel();
+		lblimg.setIcon(new ImageIcon("LottoImg.png"));
+		
 		lbl = new JLabel("횟수를 입력하세요");
 		
 		
@@ -48,6 +54,7 @@ public class StartGame extends JFrame {
 		pnlBottom.add(btnOk);
 		pnlBottom.add(btnCancel);
 		
+		add(lblimg, BorderLayout.NORTH);
 		add(pnlCenter, BorderLayout.CENTER);
 		add(pnlBottom, BorderLayout.SOUTH);
 		
@@ -58,22 +65,20 @@ public class StartGame extends JFrame {
 		btnOk.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent ae){
-				// tf에 입력 된 숫자를 받아와야 한다는 것 제가 찾았어요!!
 				String s = tf.getText();
-				System.out.println(s.length());
+				
 				if(!isDigit(s)){
-					JOptionPane.showConfirmDialog(null, "숫자를 입력해주세요", "Warning", JOptionPane.OK_OPTION, JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(null, "1부터 5까지의 숫자만 입력해주세요");
+					tf.setText("");
+					tf.requestFocus();
 				}
 				else{
 					num = Integer.parseInt(s);
+					new ChooseMyNumForm(num);
+					dispose();
 				}
-				
-				new ChooseLottoForm(num);
-				setVisible(false);
 			}
 		});
-		
-		
 		
 		btnCancel.addActionListener(new ActionListener(){
 			@Override
@@ -82,20 +87,27 @@ public class StartGame extends JFrame {
 				System.exit(0);
 			}
 		});
-		
 	}
 	
-
-
+	
 	public boolean isDigit(String s){
-		for(int i = 0; i<s.length(); i++){
-			char tmp = s.charAt(i);
+		boolean output = false;
+		if(s.length() == 1){
+			for(int i = 0; i<s.length(); i++){
+				char tmp = s.charAt(i);
 		
-			if(!('1' <= tmp && tmp <= '5')){
-				return false;
+				if(!('1' <= tmp && tmp <= '5')){
+					output = false;
+				}
+				else{
+					output = true;
+				}
 			}
 		}
-		return true;
+		else{
+			output = false;
+		}
+		return output;
 	}
 
 	private void showFrame() {
@@ -106,7 +118,6 @@ public class StartGame extends JFrame {
 		setVisible(true);
 		
 	}
-
 
 	
 	public static void main(String[] args) {
