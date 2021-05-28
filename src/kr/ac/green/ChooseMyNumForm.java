@@ -19,7 +19,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
 class ChooseMyNumForm extends JFrame implements ActionListener {
-	
+	// **************** 값 바뀐거 테스트 *******************
 	private JTextArea taInfo;
 	
 	private JButton btnStart;
