@@ -10,8 +10,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
@@ -158,22 +161,46 @@ class LottoPnlForm extends JPanel implements ActionListener {
 		tfMyNum.setText("");
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		Object src = e.getSource();
-		if (src == rbtnAuto) {
+	public void autoSelect() {
+		// List 사이즈가 6이 아니면
+		if (selectNums.size() > 0 && selectNums.size() < 6) {
+			automanual = "반자동";
+			for (int i = 0; i < 45; i++) {
+				cbs[i].setEnabled(false);
+			}
+			// 새로운 랜덤 번호 생성
+			MyNums myNums = new MyNums(selectNums);
+			HashSet<Integer> TempNums = myNums.getSemiAutoNums();
+			Integer[] semiAutoNums = TempNums.toArray(new Integer[0]);
+			Arrays.sort(semiAutoNums, 0, 6);
+			selectNums.removeAll(selectNums);
+			// 랜덤번호를 List에 넣어줌
+			for (int i = 0; i < semiAutoNums.length; i++) {
+				selectNums.add(semiAutoNums[i]);
+				tfMyNum.setText("" + selectNums);
+				rbtnAuto.setSelected(true);
+			}
+		}
+		if (selectNums.size() == 0) {
 			automanual = "자동";
 			clear(false);
 			for (int i = 0; i < 45; i++) {
 				cbs[i].setEnabled(false);
 			}
-			tfMyNum.setText("");
 			Integer[] randArr = new MyNums().getNums();
-
 			for (int i = 0; i < randArr.length; i++) {
 				selectNums.add(randArr[i]);
+				tfMyNum.setText("" + selectNums);
+				rbtnAuto.setSelected(true);
 			}
-			// System.out.println(col);
+		}
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		Object src = e.getSource();
+		if (src == rbtnAuto) {
+			autoSelect();
 		}
 		if (src == rbtnManual) {
 			clear(false);

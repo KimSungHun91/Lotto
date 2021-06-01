@@ -162,17 +162,22 @@ class ChooseMyNumForm extends JFrame implements ActionListener {
 			}
 		}
 		if (src == btnAuto) {
+			
 			for (LottoPnlForm pnl : lottoPnls) {
-				pnl.clear(true);
-				pnl.getRbtnAuto().setSelected(true);
-				for (int i = 0; i < 45; i++) {
-					pnl.getCbs()[i].setEnabled(false);
-				}
-				Integer[] randArr = new MyNums().getNums();
-				for (int i = 0; i < randArr.length; i++) {
-					pnl.getSelectNums().add(randArr[i]);
-				}
+				pnl.autoSelect();
 			}
+			
+			// for (LottoPnlForm pnl : lottoPnls) {
+			// pnl.clear(true);
+			// pnl.getRbtnAuto().setSelected(true);
+			// for (int i = 0; i < 45; i++) {
+			// pnl.getCbs()[i].setEnabled(false);
+			// }
+			// Integer[] randArr = new MyNums().getNums();
+			// for (int i = 0; i < randArr.length; i++) {
+			// pnl.getSelectNums().add(randArr[i]);
+			// }
+			// }
 		}
 	}
 }
