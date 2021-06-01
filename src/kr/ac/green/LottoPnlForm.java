@@ -24,40 +24,43 @@ import javax.swing.border.TitledBorder;
 
 class LottoPnlForm extends JPanel implements ActionListener {
 	private JTextField tfMyNum;
-	private JCheckBox[] cb;
-
+	private JCheckBox[] cbs;
 	private JRadioButton rbtnAuto;
 	private JRadioButton rbtnManual;
-	
-	private LottoGameInfo lottoGameInfo;
-	
-	// 수동번호 / 자동번호 결과
-	private List<Integer> col = new ArrayList<Integer>();
+	private String automanual = "수동";
+	private int order;
+	private int selectCount = 0;
+	private List<Integer> selectNums = new ArrayList<Integer>();
 
-	public LottoPnlForm(int no) {
-		this.lottoGameInfo = new LottoGameInfo(no);
+	public LottoPnlForm(int order) {
+		this.order = order;
 		init();
 		addListeners();
 	}
 
-	public LottoGameInfo getGameInfo() {
-		lottoGameInfo.setNumbers(col);
-		return lottoGameInfo;
+	public List<Integer> getSelectNums() {
+		return selectNums;
 	}
-	
-	// 수동자동 번호 결과 게터
-//	public List<Integer> getCol() {
-//		return col;
-//	}
+
+	public String getAutomanual() {
+		return automanual;
+	}
+
+	public JCheckBox[] getCbs() {
+		return cbs;
+	}
+
+	public JRadioButton getRbtnAuto() {
+		return rbtnAuto;
+	}
 
 	private void init() {
-		cb = new JCheckBox[45];
-
+		cbs = new JCheckBox[45];
 		// 반복문에 넣고 체크박스 계속만들어요
-		for (int i = 0; i < cb.length; i++) {
+		for (int i = 0; i < cbs.length; i++) {
 			int n = i + 1;
 			String text = String.valueOf(n);
-			cb[i] = new JCheckBox(text);
+			cbs[i] = new JCheckBox(text);
 		}
 
 		// JRadioButton 만들구요, 그룹하고..
@@ -75,7 +78,7 @@ class LottoPnlForm extends JPanel implements ActionListener {
 		this.setLayout(new BorderLayout());
 		// 북쪽에 그리드레이아웃으로 로또번호 들어갈 패널에 체크박스 추가
 		JPanel pnlLottoNum = new JPanel(new GridLayout(0, 7));
-		for (JCheckBox cbs : cb) {
+		for (JCheckBox cbs : cbs) {
 			pnlLottoNum.add(cbs);
 		}
 
@@ -90,54 +93,51 @@ class LottoPnlForm extends JPanel implements ActionListener {
 		this.add(pnlRbtn, BorderLayout.SOUTH);
 
 		// 타이틀보더 써서 이쁘게 만들었어요
-		TitledBorder tBorder = new TitledBorder(new LineBorder(Color.GRAY, 1), "Check you Number");
+		int title = order + 65;
+		char charTitle = (char) title;
+		TitledBorder tBorder = new TitledBorder(new LineBorder(Color.GRAY, 1), "" + charTitle);
 		tBorder.setTitleFont(new Font(Font.DIALOG, Font.BOLD, 13));
 		this.setBorder(tBorder);
 	}
-
-	int numcount = 0;
 
 	public void addListeners() {
 		rbtnAuto.addActionListener(this);
 		rbtnManual.addActionListener(this);
 
 		ItemListener listener = new ItemListener() {
-
 			@Override
 			public void itemStateChanged(ItemEvent ie) {
-
 				Object src = ie.getSource();
 				int result = ie.getStateChange();
 
-				for (int i = 0; i < cb.length; i++) {
-					if (cb[i] == src) {
+				for (int i = 0; i < cbs.length; i++) {
+					if (cbs[i] == src) {
 						if (result == ItemEvent.SELECTED) {
 							// System.out.println((i + 1) + "선택됨");
-							col.add(i + 1);
+							selectNums.add(i + 1);
 
 						} else if (result == ItemEvent.DESELECTED) {
 							// System.out.println((i + 1) + "해제됨");
-							col.remove(Integer.valueOf(i+1));
+							// col.remove(i + 1);
+							selectNums.remove(Integer.valueOf(i + 1));
 						}
-						Collections.sort(col);
-						tfMyNum.setText("" + col);
+						Collections.sort(selectNums);
+						tfMyNum.setText("" + selectNums);
 					}
 				}
-				// JCheckBox cb = (JCheckBox)ie.getSource();
-
 				if (ie.getStateChange() == ItemEvent.SELECTED) {
-					numcount++; // 한번 체크될때마다 1증가
+					selectCount++; // 한번 체크될때마다 1증가
 				} else {
-					numcount--; // 체크 해제될때마다 1감소
+					selectCount--; // 체크 해제될때마다 1감소
 				}
-				if (numcount > 6) { // 6개 이상 선택하려고 할 경우
+				if (selectCount > 6) { // 6개 이상 선택하려고 할 경우
 					JOptionPane.showMessageDialog(null, "6개 이상 선택할 수 없습니다"); // 경고창
 				}
 
 			}
 		};
 		// 모든 JCheckBox에 addItemListener 추가
-		for (JCheckBox cbs : cb) {
+		for (JCheckBox cbs : cbs) {
 			cbs.addItemListener(listener);
 		}
 	}
@@ -145,43 +145,41 @@ class LottoPnlForm extends JPanel implements ActionListener {
 	// 초기화 하는 메소드, 파라미터로 리셋 버튼일때와
 	// 자동 수동 버튼일 때 구분해줌
 	public void clear(boolean isReset) {
-		col.removeAll(col);
-		tfMyNum.setText("");
+		selectNums.removeAll(selectNums);
 		for (int i = 0; i < 45; i++) {
-			cb[i].setSelected(false);
+			cbs[i].setSelected(false);
 		}
 		for (int i = 0; i < 45; i++) {
-			cb[i].setEnabled(true);
+			cbs[i].setEnabled(true);
 		}
 		if (isReset) {
 			rbtnManual.setSelected(true);
 		}
+		tfMyNum.setText("");
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		Object src = e.getSource();
 		if (src == rbtnAuto) {
+			automanual = "자동";
 			clear(false);
-			col.removeAll(col);
 			for (int i = 0; i < 45; i++) {
-				cb[i].setEnabled(false);
+				cbs[i].setEnabled(false);
 			}
 			tfMyNum.setText("");
 			Integer[] randArr = new MyNums().getNums();
 
 			for (int i = 0; i < randArr.length; i++) {
-				col.add(randArr[i]);
+				selectNums.add(randArr[i]);
 			}
-			System.out.println(col);
-			lottoGameInfo.setAuto(true);
+			// System.out.println(col);
 		}
 		if (src == rbtnManual) {
 			clear(false);
 			for (int i = 0; i < 45; i++) {
-				cb[i].setEnabled(true);
+				cbs[i].setEnabled(true);
 			}
-			lottoGameInfo.setAuto(false);
 		}
 	}
 }

@@ -6,43 +6,28 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
-import java.util.TreeSet;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JFrame;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.border.LineBorder;
 
-class LottoResult extends JFrame implements ActionListener {
-
+class LottoResult extends JDialog implements ActionListener {
 	private JLabel lblMain;
 	private JLabel lblPlus;
-
 	private JLabel[] lblWinNums = new JLabel[7];
-
 	private Integer[] winNum;
-	private String[] strWinNums = new String[7];
-
-	private TreeSet<Integer> winNums = new TreeSet<>();
-
-	private JButton btnClose;
+	private JButton btnBack;
 	private JButton btnTrace;
-
-	private LineBorder border;
 	private Color bColor;
-
 	private ResultPnlForm[] resultPanels;
-	
-	private List<LottoGameInfo> gameInfos;
-
+	private ChooseMyNumForm chooseMyNumForm;
 	private int count;
+	private LottoNums goalNums;
 
-	
-	public LottoResult(int count, List<LottoGameInfo> gameInfos) {
-		this.gameInfos = gameInfos;
+	public LottoResult(int count, ChooseMyNumForm chooseMyNumForm) {
+		this.chooseMyNumForm = chooseMyNumForm;
 		this.count = count;
 		init();
 		addListener();
@@ -50,29 +35,48 @@ class LottoResult extends JFrame implements ActionListener {
 		showFrame();
 	}
 
+	public int getCount() {
+		return count;
+	}
+
+	public Integer[] getWinNum() {
+		return winNum;
+	}
+
+	public LottoNums getGoalNums() {
+		return goalNums;
+	}
+
 	private void init() {
 		lblMain = new JLabel();
 		lblMain.setIcon(new ImageIcon("LottoImg.png"));
 		lblPlus = new JLabel("+", JLabel.CENTER);
-		border = new LineBorder(Color.BLACK, 1);
 		winNum = new LottoNums().getNums();
+		bColor = new Color(236, 25, 42);
 
 		for (int i = 0; i < lblWinNums.length; i++) {
 			lblWinNums[i] = new JLabel("" + winNum[i]);
-			lblWinNums[i].setBorder(border);
+			if (winNum[i] <= 10) {
+				lblWinNums[i].setIcon(new ImageIcon("Lotto10.png"));
+			} else if (winNum[i] > 10 && winNum[i] <= 20) {
+				lblWinNums[i].setIcon(new ImageIcon("Lotto20.png"));
+			} else if (winNum[i] > 20 && winNum[i] <= 30) {
+				lblWinNums[i].setIcon(new ImageIcon("Lotto30.png"));
+			} else if (winNum[i] > 30 && winNum[i] <= 40) {
+				lblWinNums[i].setIcon(new ImageIcon("Lotto40.png"));
+			} else if (winNum[i] > 40 && winNum[i] <= 45) {
+				lblWinNums[i].setIcon(new ImageIcon("Lotto50.png"));
+			}
+			lblWinNums[i].setHorizontalTextPosition(JLabel.CENTER);
 		}
 
-		Integer[] winNumF = winNums.toArray(new Integer[0]);
-		for (int i = 0; i < winNumF.length; i++) {
-			strWinNums[i] = String.valueOf(winNumF[i]);
-			lblWinNums[i] = new JLabel(strWinNums[i], JLabel.CENTER);
-		}
-		btnClose = new JButton("Close");
-		btnTrace = new JButton("Trace");
+		btnBack = new JButton("돌아가기");
+		btnTrace = new JButton("찾기");
 	}
 
 	private void addListener() {
-		btnClose.addActionListener(this);
+		btnBack.addActionListener(this);
+		btnTrace.addActionListener(this);
 	}
 
 	private void setDisplay() {
@@ -91,33 +95,24 @@ class LottoResult extends JFrame implements ActionListener {
 
 		JPanel pnlSouth = new JPanel(new GridLayout(0, 1));
 
-		
 		resultPanels = new ResultPnlForm[count];
 		for (int i = 0; i < count; i++) {
-			// [[1,2,3,4,5,6], [2,3,4,5,6,7], [3,4,5,6,7,8]]
-			// [1,2,3,4,5,6] resultPanels[0]
-			// [2,3,4,5,6,7] resultPanels[1]
-			// [3,4,5,6,7,8] resultPanels[2]
-			resultPanels[i] = new ResultPnlForm(gameInfos.get(i));
+			resultPanels[i] = new ResultPnlForm(i, chooseMyNumForm, this);
 			pnlSouth.add(resultPanels[i]);
 		}
-		
-		
+
 		pnlPlus.add(lblPlus);
 		pnlPlus.setBackground(bColor);
 
 		for (int i = 0; i < lblWinNums.length; i++) {
-			lblWinNums[i].setBorder(border);
 			if (i == 6) {
 				pnlWinNum.add(pnlPlus);
 			}
 			pnlWinNum.add(lblWinNums[i]);
 		}
-		
-		
 		pnlCenter.setBackground(bColor);
 
-		pnlButton.add(btnClose);
+		pnlButton.add(btnBack);
 		pnlButton.add(btnTrace);
 
 		pnlCenter.add(new JLabel("당첨번호 : "), BorderLayout.NORTH);
@@ -137,17 +132,21 @@ class LottoResult extends JFrame implements ActionListener {
 	private void showFrame() {
 		setTitle("Lotto");
 		pack();
-		setLocation(100, 0);
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setLocationRelativeTo(null);
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		setResizable(false);
 		setVisible(true);
 	}
-	
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		Object scr = e.getSource();
-		if (scr == btnClose) {
+		if (scr == btnBack) {
 			dispose();
 			new ChooseMyNumForm(count);
+		}
+		if (scr == btnTrace) {
+			new LottoTrace(chooseMyNumForm);
 		}
 	}
 }
